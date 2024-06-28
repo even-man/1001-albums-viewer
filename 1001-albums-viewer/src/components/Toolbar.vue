@@ -59,6 +59,4 @@ label {
     font-weight: 500;
     font-family: inherit;
 }
-
-select {}
 </style>
