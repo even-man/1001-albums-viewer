@@ -24,7 +24,7 @@ const emit = defineEmits(['filter-changed', 'filter-text-changed'])
 const filterTypes = [
     'Album',
     'Artist',
-    'Genre'
+    'Genre',
 ]
 
 const filter = ref('Album');
