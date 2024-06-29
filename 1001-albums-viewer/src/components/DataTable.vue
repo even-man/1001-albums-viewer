@@ -1,6 +1,6 @@
 <template>
     <div id="data-table">
-        <EasyDataTable table-class-name="customize-table" :headers="headers" :items="props.data" theme-color="#242424">
+        <EasyDataTable table-class-name="customize-table" :currentPage="currentPage" :headers="headers" :items="props.data" theme-color="#242424">
             <template #item-controversialScore="item">
                 {{ Math.round(item.controversialScore * 1000) / 1000 }}
             </template>
@@ -17,11 +17,10 @@ import { ref, defineProps } from 'vue';
 
 const props = defineProps({
     headers: Array,
-    data: Array
+    data: Array,
 })
 
 const headers = ref(props.headers);
-
 </script>
 
 <style scoped>

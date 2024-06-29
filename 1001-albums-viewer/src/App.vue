@@ -16,25 +16,34 @@ const headers = [
 ]
 
 const filter = ref('Album');
+const filterText = ref('');
 const filteredAlbums = ref([]);
 
 function handleFilterChanged(newFilter) {
   filter.value = newFilter;
+  doFilterSearch();
 }
 
 function handleFilterTextChanged(newFilterText) {
-  if (filter.value === "Album") {
-    filteredAlbums.value = albums.albums.filter(album => album.name.toLowerCase().includes(newFilterText.toLowerCase()))
-  } else if (filter.value === "Artist") {
-    filteredAlbums.value = albums.albums.filter(album => album.artist.toLowerCase().includes(newFilterText.toLowerCase()))
-  } else if (filter.value === "Genre") {
-    filteredAlbums.value = albums.albums.filter(album => album.genres.toString().toLowerCase().includes(newFilterText.toLowerCase()))
+  filterText.value = newFilterText;
+  doFilterSearch();
+}
+
+function doFilterSearch(){
+  if (filterText.value === '') {
+    filteredAlbums.value = [];
+    return;
   }
 
-  if (newFilterText === '') {
-    filteredAlbums.value === []
+  const keyNames = {
+    "Album": "name",
+    "Artist": "artist",
+    "Genre": "genres",
   }
+  const key = keyNames[filter.value];
 
+  filteredAlbums.value =
+    albums.albums.filter(album => (key === "genres" ? album[key].join(" ") : album[key]).toLowerCase().includes(filterText.value.toLowerCase()));
 }
 
 function visitLink() {
@@ -49,7 +58,7 @@ function visitLink() {
     <h3 @click="visitLink" class="rainbow rainbow_text_animated">JOIN 1001 ALBUMS HERE</h3>
   </div>
   <Toolbar @filter-changed="handleFilterChanged" @filter-text-changed="handleFilterTextChanged" />
-  <DataTable :data="filteredAlbums.length === 0 ? albums.albums : filteredAlbums" :headers="headers" />
+  <DataTable :data="filteredAlbums.length > 0 ? filteredAlbums : albums.albums" :headers="headers" />
 
 </template>
 
