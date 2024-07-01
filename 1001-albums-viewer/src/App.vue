@@ -17,6 +17,10 @@ const headers = [
 
 const filter = ref('Album');
 const filterText = ref('');
+const numericSort = ref({
+  field: "None",
+  ascending: false,
+})
 const filteredAlbums = ref([]);
 
 function handleFilterChanged(newFilter) {
@@ -29,21 +33,46 @@ function handleFilterTextChanged(newFilterText) {
   doFilterSearch();
 }
 
-function doFilterSearch(){
-  if (filterText.value === '') {
+function handleNumericSort(newNumericSort) {
+  numericSort.value = newNumericSort;
+  console.log('app ', numericSort.value)
+  doFilterSearch();
+}
+
+function doFilterSearch() {
+
+  // no filter text, filtered ablums should be empty
+  // no sorting, filtred albums should be empty
+  // just display raw albums
+  if (filterText.value === '' && numericSort.value.field === "None") {
     filteredAlbums.value = [];
     return;
   }
 
-  const keyNames = {
+  const keyFilterNames = {
     "Album": "name",
     "Artist": "artist",
     "Genre": "genres",
   }
-  const key = keyNames[filter.value];
+  const keyFilter = keyFilterNames[filter.value];
 
   filteredAlbums.value =
-    albums.albums.filter(album => (key === "genres" ? album[key].join(" ") : album[key]).toLowerCase().includes(filterText.value.toLowerCase()));
+    albums.albums.filter(album => (keyFilter === "genres" ? album[keyFilter].join(" ") : album[keyFilter]).toLowerCase().includes(filterText.value.toLowerCase()));
+
+
+  const keySortNames = {
+    "Average Rating": "averageRating",
+    "Votes": "votes",
+    "Controversial Score": "controversialScore"
+  }
+  const sortKey = keySortNames[numericSort.value.field];
+
+  filteredAlbums.value.sort((a, b) => {
+    if (numericSort.value.ascending) return a[sortKey] - b[sortKey]
+    return b[sortKey] - a[sortKey]
+  })
+
+
 }
 
 function visitLink() {
@@ -57,7 +86,8 @@ function visitLink() {
   <div id="sign-up-here">
     <h3 @click="visitLink" class="rainbow rainbow_text_animated">JOIN 1001 ALBUMS HERE</h3>
   </div>
-  <Toolbar @filter-changed="handleFilterChanged" @filter-text-changed="handleFilterTextChanged" />
+  <Toolbar @filter-changed="handleFilterChanged" @filter-text-changed="handleFilterTextChanged"
+    @numeric-sort-changed="handleNumericSort" />
   <DataTable :data="filteredAlbums.length > 0 ? filteredAlbums : albums.albums" :headers="headers" />
 
 </template>

@@ -27,7 +27,7 @@
 
 <script setup>
 
-import { ref, watch } from 'vue';
+import { ref, watch, reactive } from 'vue';
 const emit = defineEmits(['filter-changed', 'filter-text-changed', 'numeric-sort-changed'])
 
 const filterTypes = [
@@ -46,7 +46,7 @@ const numericSorts = [
 const filter = ref('Album');
 const filterText = ref('');
 
-const numericSort = ref({
+const numericSort = reactive({
     field: 'None',
     ascending: false,
 })
@@ -60,7 +60,8 @@ watch(filterText, () => {
 })
 
 watch(numericSort, () => {
-    emit('numeric-sort-changed', numericSort.value);
+    console.log('toolbar', numericSort);
+    emit('numeric-sort-changed', numericSort);
 })
 
 
