@@ -57,7 +57,7 @@ function doFilterSearch() {
   const keyFilter = keyFilterNames[filter.value];
 
   filteredAlbums.value =
-    albums.albums.filter(album => (keyFilter === "genres" ? album[keyFilter].join(" ") : album[keyFilter]).toLowerCase().includes(filterText.value.toLowerCase()));
+    albums.value.albums.filter(album => (keyFilter === "genres" ? album[keyFilter].join(" ") : album[keyFilter]).toLowerCase().includes(filterText.value.toLowerCase()));
 
 
   const keySortNames = {
