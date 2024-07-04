@@ -3,8 +3,8 @@ import NavBar from './components/NavBar.vue';
 import Toolbar from './components/Toolbar.vue';
 import DataTable from './components/DataTable.vue';
 
-import { ref } from 'vue'
-import albums from './assets/albums.json'
+import { ref, onMounted } from 'vue'
+import albumsFile from './assets/albums.json'
 
 const headers = [
   { text: "Name", value: "name" },
@@ -79,12 +79,48 @@ function visitLink() {
   window.open("https://1001albumsgenerator.com/", '_blank').focus();
 }
 
+const albums = ref({ albums: [] })
+const errors = ref('');
+
+onMounted(async () => {
+  try {
+
+    errors.value = '';
+
+    let url = process.env.NODE_ENV === "production" ? 'https://1001albumsfunction20240703203050.azurewebsites.net/api/getAlbums' : 'http://localhost:7168/api/GetAlbums'
+    let apiResponse = await fetch(url)
+
+    if (apiResponse.status !== 200) {
+      throw new Error()
+    }
+    let albumsResponse = await apiResponse.json()
+
+    // handle soft errors
+    if (albumsResponse.hasErrors) {
+      albumsResponse.errors.forEach(error => errors.value = errors.value + error + ' ');
+      albums.value.albums = albumsFile.albums;
+    } else {
+      albums.value.albums = albumsResponse.albums;
+    }
+
+
+
+
+  } catch (ex) {
+    console.log(ex);
+    albums.value.albums = albumsFile.albums;
+  }
+})
+
 </script>
 
 <template>
   <NavBar />
   <div id="sign-up-here">
     <h3 @click="visitLink" class="rainbow rainbow_text_animated">JOIN 1001 ALBUMS HERE</h3>
+  </div>
+  <div style="color: red;" v-if="errors !== ''">
+    {{ errors }}
   </div>
   <Toolbar @filter-changed="handleFilterChanged" @filter-text-changed="handleFilterTextChanged"
     @numeric-sort-changed="handleNumericSort" />
