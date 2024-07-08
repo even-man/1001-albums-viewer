@@ -21,14 +21,23 @@
             <label for="ascending">Ascending</label>
             <input :disabled="numericSort.field === 'None'" v-model="numericSort.ascending" type="checkbox">
         </div>
+        <div class="input-field">
+            <StatsDialog :albums="albums" />
+        </div>
     </div>
 
 </template>
 
 <script setup>
 
-import { ref, watch, reactive } from 'vue';
+import StatsDialog from './StatsDialog.vue';
+import { ref, watch, reactive, defineProps } from 'vue';
 const emit = defineEmits(['filter-changed', 'filter-text-changed', 'numeric-sort-changed'])
+
+const props = defineProps({
+    albums: Array,
+})
+
 
 const filterTypes = [
     'Album',

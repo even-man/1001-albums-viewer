@@ -123,7 +123,7 @@ onMounted(async () => {
     {{ errors }}
   </div>
   <Toolbar @filter-changed="handleFilterChanged" @filter-text-changed="handleFilterTextChanged"
-    @numeric-sort-changed="handleNumericSort" />
+    @numeric-sort-changed="handleNumericSort" :albums="filteredAlbums.length > 0 ? filteredAlbums : albums.albums" />
   <DataTable :data="filteredAlbums.length > 0 ? filteredAlbums : albums.albums" :headers="headers" />
 
 </template>
