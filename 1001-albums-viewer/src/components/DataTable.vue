@@ -1,81 +1,89 @@
 <template>
-    <div id="data-table">
-        <EasyDataTable table-class-name="customize-table" :headers="headers" :items="props.data" theme-color="#242424">
-            <template #item-controversialScore="item">
-                {{ Math.round(item.controversialScore * 1000) / 1000 }}
+    <div>
+        <div class="d-flex">
+            <v-expansion-panels>
+                <v-expansion-panel
+                    title="Filters"
+                    color="primary"
+                    elevation="0"
+                    tile
+                >
+                    <v-expansion-panel-text>
+                        <v-text-field v-model="filter" variant="underlined" class="mx-2 mt-2" label="Filter data"></v-text-field>
+                        <div class="d-flex align-items-center">
+                            <v-select v-model="genreFilter" multiple :disabled="showAllGenres" :items="genres" variant="underlined" class="mx-2 mt-2" label="Genres"></v-select>
+                            <v-checkbox v-model="showAllGenres" label="Show All" ></v-checkbox>
+                        </div>
+                        
+                    </v-expansion-panel-text>
+                </v-expansion-panel>
+            </v-expansion-panels>
+            <div class="mx-2 mt-1">
+                <Stats :albums="albums"></Stats>
+            </div>
+            
+        </div>
+        
+        <v-data-table :headers="headers"
+                      :items="albums"
+                      :search="filter">
+            <template v-slot:item.controversialScore="{value}">
+                {{ Math.round(value * 1000) / 1000 }}
             </template>
-
-            <template #item-genres="item">
-                <span v-for="genre in item.genres">{{ genre + ' ' }}</span>
+            <template v-slot:item.genres="{value}">
+                <div class="genres">
+                    <v-chip class="ma-1" size="small" label color="secondary" variant="flat" v-for="genre in value">{{ genre }}</v-chip>
+                </div>
             </template>
-        </EasyDataTable>
+                      
+        </v-data-table>
     </div>
+    
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
+import { onMounted, ref } from 'vue';
+import albumsFile from '../assets/albums.json'
+import Stats from './Stats.vue';
 
-const props = defineProps({
-    headers: Array,
-    data: Array,
+const albums = ref([])
+const filter = ref("");
+const headers = [
+  { title: "Name", key: "name" },
+  { title: "Artist", key: "artist" },
+  { title: "Average Rating", key: "averageRating" },
+  { title: "Votes", key: "votes" },
+  { title: "Controversial Score", key: "controversialScore" },
+  { title: "Genres", key: "genres" },
+]
+
+const genres = ref([]);
+const genreFilter = ref([]);
+const showAllGenres = ref(true);
+
+onMounted(() => {
+    try {
+        albums.value = albumsFile.albums;
+        genres.value = []
+        albums.value.forEach(album => {
+            album.genres.forEach(genre => {
+                if (!genres.value.includes(genre)) {
+                    genres.value.push(genre);
+                }
+            })
+        })
+    } catch {
+        console.error("Error loading albums data.");
+    }
 })
 
-const headers = ref(props.headers);
+
 </script>
 
 <style scoped>
-#data-table {
-    margin-bottom: 5rem;
+
+.genres {
+    display: flex;
 }
 
-.customize-table {
-    --easy-table-border: 1px solid #445269;
-    --easy-table-row-border: 1px solid #445269;
-
-    --easy-table-header-font-size: 14px;
-    --easy-table-header-height: 50px;
-    --easy-table-header-font-color: #c1cad4;
-    --easy-table-header-background-color: #646cff;
-
-    --easy-table-header-item-padding: 10px 15px;
-
-    --easy-table-body-even-row-font-color: #fff;
-    --easy-table-body-even-row-background-color: #4c5d7a;
-
-    --easy-table-body-row-font-color: #c0c7d2;
-    --easy-table-body-row-background-color: #3f3e3e;
-    --easy-table-body-row-height: 50px;
-    --easy-table-body-row-font-size: 14px;
-
-    --easy-table-body-row-hover-font-color: #2d3a4f;
-    --easy-table-body-row-hover-background-color: #eee;
-
-    --easy-table-body-item-padding: 10px 15px;
-
-    --easy-table-footer-background-color: #646cff;
-    --easy-table-footer-font-color: #c0c7d2;
-    --easy-table-footer-font-size: 14px;
-    --easy-table-footer-padding: 0px 10px;
-    --easy-table-footer-height: 50px;
-
-    --easy-table-rows-per-page-selector-width: 70px;
-    --easy-table-rows-per-page-selector-option-padding: 10px;
-    --easy-table-rows-per-page-selector-z-index: 1;
-
-
-    --easy-table-scrollbar-track-color: #2d3a4f;
-    --easy-table-scrollbar-color: #2d3a4f;
-    --easy-table-scrollbar-thumb-color: #4c5d7a;
-    ;
-    --easy-table-scrollbar-corner-color: #2d3a4f;
-
-    --easy-table-loading-mask-background-color: #2d3a4f;
-}
-
-span {
-    background-color: #646cff;
-    border-radius: 1rem;
-    margin: 5px;
-    padding: 4px;
-}
 </style>
